@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router() 
 const mongoose = require('mongoose')
 const multer = require('multer')
-// const Auth = require('../middleware/auth');
+const Auth = require('../middleware/auth');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
 
 const Movie = require('../models/movies')
 
-router.get("/", (req, res, next) => {
+router.get("/", Auth, (req, res, next) => {
     Movie.find()
       .select("moviename year _id movieImage")
       .exec()
@@ -61,7 +61,7 @@ router.get("/", (req, res, next) => {
       }) 
   }) 
 
-router.post('/',upload.single('movieImage'),(req,res) =>{
+router.post('/',Auth,upload.single('movieImage'),(req,res) =>{
     const movie = new Movie({
         _id: new mongoose.Types.ObjectId(),
          moviename: req.body.moviename, 
@@ -91,7 +91,7 @@ router.post('/',upload.single('movieImage'),(req,res) =>{
 }) 
 
 
-router.get('/:movieId',(req,res) =>{
+router.get('/:movieId',Auth,(req,res) =>{
 const id= req.params.movieId 
 Movie.findById(id)
 .select('moviename year _id movieImage')
@@ -118,7 +118,7 @@ res.status(500).json(err)
 )
 }) 
 
-router.patch('/:movieId', (req,res) =>{
+router.patch('/:movieId', Auth,(req,res) =>{
     const id = req.params.movieId 
     const update = {} 
     for(const vals of req.body){
@@ -142,7 +142,7 @@ res.status(500).json({err})
 }) 
 
 
-router.delete('/:movieId',(req,res) =>{
+router.delete('/:movieId',Auth,(req,res) =>{
    const id = req.params.movieId 
    Movie.remove({_id:id})
    .exec()
